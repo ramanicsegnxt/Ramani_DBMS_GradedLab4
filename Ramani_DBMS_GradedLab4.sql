@@ -207,6 +207,7 @@ select CUS_NAME as 'CUSTOMER NAME', CUS_GENDER as 'GENDER'
 -- else print “Poor Service”. 
 -- Note that there should be one rating per supplier.
 
+delimiter //
 create definer='root'@'localhost' procedure rating_proc()
 begin
 	select report.supp_id, report.supp_name, report.Average,
@@ -215,7 +216,7 @@ begin
     	when report.Average > 4 then 'Good Service'
     	when report.Average > 2 then 'Average Service'
     	else 'Poor Service'
-	end as Type_of_Service from(
+		end as Type_of_Service from(
 		select final.supp_id, supplier.supp_name, final.Average from(
 			select test2.supp_id, sum(test2.rat_ratstars)/count(test2.rat_ratstars) as Average from(
 				select supplier_pricing.supp_id, test.ORD_ID, test.RAT_RATSTARS from supplier_pricing inner join(
@@ -225,4 +226,4 @@ begin
             ) as test2 group by test2.supp_id
         ) as final inner join supplier where final.supp_id = supplier.supp_id
     ) as report;
-end
+end //
